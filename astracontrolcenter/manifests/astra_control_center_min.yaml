@@ -1,0 +1,18 @@
+apiVersion: astra.netapp.io/v1
+kind: AstraControlCenter
+metadata:
+  name: astra 
+spec:
+  accountName: "astra-poc"
+  astraVersion: "21.12.60"
+  astraAddress: "astra-poc.fqdn"
+  autoSupport:
+    enrolled: false
+  email: "admin@poc-system"
+  firstName: "Astra"
+  lastName: "PoC"
+  storageClass: "trident-gold"
+  imageRegistry:
+    name: "my.registry.com/username/docker-images"
+    secret: "astra-registry-cred"
+

@@ -1,0 +1,10 @@
+k8s-in-aws/.terraform*
+k8s-in-gcp/.terraform*
+k8s-in-azure/.terraform*
+*terraform.tfstate*
+k8s-in-azure/account.json
+k8s-in-gcp/account.json
+credentials/acc*
+credentials/azure*
+credentials/*
+.gitignore
