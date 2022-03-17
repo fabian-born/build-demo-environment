@@ -9,3 +9,4 @@ credentials/azure*
 credentials/*
 .gitignore
 */*.orig
+spotbyNetApp/*

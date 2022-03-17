@@ -16,6 +16,6 @@ data "azurerm_resource_group" "default" {
 /* Download Kubeconfig */
 resource "local_file" "kubeconfig" {
   content  = "${azurerm_kubernetes_cluster.akscluster.kube_config_raw}"
-  filename = "/home/fabian/.kube/kubeconfig-azure-${random_pet.prefix.id}"
+  filename = "../delivery/kubeconfig-azure-${random_pet.prefix.id}"
 }
 
