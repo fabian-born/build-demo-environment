@@ -8,3 +8,4 @@ credentials/acc*
 credentials/azure*
 credentials/*
 .gitignore
+*/*.orig
