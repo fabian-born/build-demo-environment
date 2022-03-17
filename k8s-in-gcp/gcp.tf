@@ -1,10 +1,9 @@
-resource "random_pet" "prefix" {}
 
 
 provider "google" {
   credentials = "${file("../credentials/account.json")}"
   project = "${var.gcp-project}"
-  region  = "europe-west3"
+  region  = var.region
   zone    = "europe-west3-c"
 }
 
@@ -19,16 +18,22 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
 
+locals {
+  cluster_type = "simple-regional"
+}
+
 module "gke" {
   source                     = "terraform-google-modules/kubernetes-engine/google"
   project_id                 = "${var.gcp-project}"
   name                       = "${var.prefix}${random_pet.prefix.id}"
-  region                     = "us-central1"
-  zones                      = ["us-central1-a", "us-central1-b", "us-central1-f"]
-  network                    = "default"
-  subnetwork                 = "default"
-  ip_range_pods              = ""
-  ip_range_services          = ""
+  region                     = var.region
+  create_service_account = false
+  regional               = true
+  # zones                      = ["us-central1-a", "us-central1-b", "us-central1-f"]
+  network                    = var.network
+  subnetwork                 = var.subnetwork
+  ip_range_pods              = var.ip_range_pods
+  ip_range_services          = var.ip_range_services
   http_load_balancing        = false
   network_policy             = false
   horizontal_pod_autoscaling = true
@@ -38,7 +43,7 @@ module "gke" {
     {
       name                      = "default-node-pool"
       machine_type              = "e2-medium"
-      node_locations            = "us-central1-b,us-central1-c"
+#      node_locations            = "us-central1-b,us-central1-c"
       min_count                 = 1
       max_count                 = 100
       local_ssd_count           = 0
@@ -49,7 +54,7 @@ module "gke" {
       auto_upgrade              = true
       service_account           = "${var.gcp-sa}"
       preemptible               = false
-      initial_node_count        = 80
+      initial_node_count        = 4
     },
   ]
 
@@ -96,4 +101,16 @@ module "gke" {
       "default-node-pool",
     ]
   }
+}
+
+module "gke_auth" {
+  source = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  project_id   = var.gcp-project
+  location     = module.gke.location
+  cluster_name = module.gke.name
+}
+
+resource "local_file" "kubeconfig" {
+  content  = module.gke_auth.kubeconfig_raw
+  filename = "./gke-kubeconfig"
 }
