@@ -54,7 +54,7 @@ module "gke" {
       auto_upgrade              = true
       service_account           = "${var.gcp-sa}"
       preemptible               = false
-      initial_node_count        = 4
+      initial_node_count        = 1
     },
   ]
 
@@ -78,7 +78,7 @@ module "gke" {
     all = {}
 
     default-node-pool = {
-      node-pool-metadata-custom-value = "my-node-pool"
+      node-pool-metadata-custom-value = var.nodepoolname
     }
   }
 
@@ -114,3 +114,15 @@ resource "local_file" "kubeconfig" {
   content  = module.gke_auth.kubeconfig_raw
   filename = "./gke-kubeconfig"
 }
+
+
+resource "null_resource" "kubectl" {
+  provisioner "local-exec" {
+    command = "kubectl ${var.cmd_snapshotter} --kubeconfig <(echo $KUBECONFIG | base64 --decode)"
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      KUBECONFIG = base64encode(module.gke_auth.kubeconfig_raw)
+    }
+  }
+}
+
