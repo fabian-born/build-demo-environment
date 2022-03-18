@@ -10,3 +10,4 @@ credentials/*
 .gitignore
 */*.orig
 spotbyNetApp/*
+astracontrol/*
