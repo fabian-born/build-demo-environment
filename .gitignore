@@ -13,3 +13,4 @@ credentials/ansible_vars.yaml
 */*.orig
 spotbyNetApp/*
 astracontrol/manifests/*
+delivery/*
