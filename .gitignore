@@ -6,8 +6,8 @@ k8s-in-azure/account.json
 k8s-in-gcp/account.json
 credentials/acc*
 credentials/azure*
-credentials/*
+credentials/ansible_vars.yaml
 .gitignore
 */*.orig
 spotbyNetApp/*
-astracontrol/*
+astracontrol/manifests/*

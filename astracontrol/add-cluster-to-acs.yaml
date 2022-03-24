@@ -1,0 +1,101 @@
+---
+- name: Using a REST API to add a Kubernetes Cluster to Astra Control Service
+  become: false
+  hosts: localhost
+  vars_files: 
+    - "../credentials/ansible_vars.yaml"
+
+  gather_facts: false
+  tasks:
+    - debug:
+        msg: "Let’s call an API"
+
+    - name: Read CloudProvider ID
+      uri:
+        url: https://{{ astra_api_endpoint }}/accounts/{{ astra_account_id }}/topology/v1/clouds?include=id%2Cname%2CState%2CCloudType
+        method: GET
+        body_format: json
+        return_content: yes
+        headers:
+          Content-Type: application/json
+          authorization: "Bearer {{ astra_api_token }}"
+      register: astraclouds
+
+    - name: Get Cloudprovider ID 
+      set_fact:
+        cloudprovider_id: "{{ astraclouds.json | to_json | from_json | json_query(jsonquery) | join('') }}"
+      vars:
+         jsonquery: "items[? name==`{{ cloudprovidername }}`].id"
+    
+    - name: Print out Cloud Provider ID
+      debug:
+        msg: "{{ (cloudprovider_id) }}"
+      when: run_debug == true
+
+    - name: Get AstraCluster ID
+      uri:
+        url: https://{{ astra_api_endpoint }}/accounts/{{ astra_account_id }}/topology/v1/clouds/{{ cloudprovider_id }}/clusters?include=id%2Cname%2CmanagedState'
+        method: GET
+        body_format: json
+        return_content: yes
+        headers:
+          Content-Type: application/json
+          authorization: "Bearer {{ astra_api_token }}"
+      register: astracluster
+
+     
+    - name: Get Cluster ID
+      set_fact:
+        cluster_id: "{{ astracluster.json | to_json | from_json | json_query(jsonquery) | join('') }}"
+      vars:
+         jsonquery: "items[? name==`{{ clustername }}`].id"
+
+    - name: Print out Cluster ID
+      debug:
+        msg: "{{ (cluster_id) }}"
+      when: run_debug == true
+
+##
+## Get NetApp Storage Class for default
+##
+    - name: Get Default StorageClass ID
+      uri:
+        url: https://{{ astra_api_endpoint }}/accounts/{{ astra_account_id }}/topology/v1/clouds/{{ cloudprovider_id }}/clusters/{{ cluster_id }}/storageClasses?include=id%2Cname%2CmanagedState'
+        method: GET
+        body_format: json
+        return_content: yes
+        headers:
+          Content-Type: application/json
+          authorization: "Bearer {{ astra_api_token }}"
+      register: astradefaultsc
+      when: cluster_id != ""
+
+    - name: Get Cluster ID
+      set_fact:
+        storageclass_id: "{{ astradefaultsc.json | to_json | from_json | json_query(jsonquery) | join('') }}"
+      vars:
+         jsonquery: "items[? name==`{{ storageclassname }}`].id"
+      when: cluster_id != ""
+
+    - name: Print out StorageClassId ID
+      debug:
+        msg: "{{ (storageclass_id) }}"
+      when: run_debug == true and cluster_id != ""
+
+    - name: Print out Cloud Provider ID
+      debug:
+        msg: "{{ manager_cluster_body }}"
+      when: run_debug == true
+##
+## Get NetApp Storage Class for default
+##
+    - name: Add {{ clustername }} to as managed to Astra
+      uri:
+        url: https://{{ astra_api_endpoint }}/accounts/{{ astra_account_id }}/topology/v1/managedClusters
+        method: POST
+        body: "{{ manager_cluster_body }}"
+        body_format: json
+        status_code: 201,200
+        headers:
+          authorization: "Bearer {{ astra_api_token }}"
+      when: cluster_id != ""
