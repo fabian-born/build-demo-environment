@@ -5,7 +5,9 @@ k8s-in-azure/.terraform*
 k8s-in-azure/account.json
 k8s-in-gcp/account.json
 credentials/acc*
-credentials/azure*
+credentials/astra.tfvars
+credentials/gcp.tfvars
+credentials/azure.tfvars
 credentials/ansible_vars.yaml
 .gitignore
 */*.orig
