@@ -21,7 +21,7 @@ Following Paramter are allowed:
 | Parameter | Value |
 | --------- | ----- |
 | cloudprovidername | Azure, GCP |
-| clustername |  "dynamisch"|
+| clustername | aks or gke clustername |
 | storageclassname | netapp-anf-perf-standard,netapp-cvs-perf-standard,netapp-cvs-perf-extreme,netapp-cvs-perf-premium |
 | astra_api_token | your api token |
 | astra_account_id | your account id |
