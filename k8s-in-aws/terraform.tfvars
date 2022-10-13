@@ -9,3 +9,10 @@ prefix	                    = "prefix"
 
 spotinst_account            = ""
 spotinst_token              = ""
+
+automatic_backup_retention = 30
+svm_name                   = "svm_astrademo"
+netbios_name               = "astrademo"
+dns_ips                    = [""]
+domain_name                = ""
+fsxadmin_password      = "password123!"
